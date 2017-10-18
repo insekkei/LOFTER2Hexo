@@ -143,9 +143,9 @@ function parsearticle(article) {
                 imgArray.forEach(function(imgURL) {
                     imgURL = imgURL.match(/http.*\.jpg|http.*\.jpeg|http.*\.png/)
                     if (imgURL) {
-                      content = content.replace(/!\[(.*?)\]\((.*?)\)/, function(whole, imgName, url) {
+                      content = content.replace(/!\[(.*?)\]\((.*?)\)/g, function(whole, imgName, url) {
                           _downloadImg(imgURL[0], imgName)
-                          return `![${imgName}](./${url.split('/').pop()})`
+                          return `![${imgName}](./img/${url.split('/').pop()})`
                       })
                     }
                 })
