@@ -141,11 +141,13 @@ function parsearticle(article) {
 
             if (imgArray && imgArray.length) {
                 imgArray.forEach(function(imgURL) {
-                    imgURL = imgURL.match(/http.*\.jpg|http.*\.jpeg|http.*\.png/)[0]
-                    content = content.replace(/!\[(.*?)\]\((.*?)\)/, function(whole, imgName, url) {
-                        _downloadImg(imgURL, imgName)
-                        return `![${imgName}](./${url.split('/').pop()})`
-                    })
+                    imgURL = imgURL.match(/http.*\.jpg|http.*\.jpeg|http.*\.png/)
+                    if (imgURL) {
+                      content = content.replace(/!\[(.*?)\]\((.*?)\)/, function(whole, imgName, url) {
+                          _downloadImg(imgURL[0], imgName)
+                          return `![${imgName}](./${url.split('/').pop()})`
+                      })
+                    }
                 })
             }
         } else if (article.photoLinks != null) {
@@ -194,7 +196,7 @@ function parsearticle(article) {
                 dest: outputImgPath,
                 done: function(err, imgName, image) {
                     if (err) {
-                        throw err
+                        console.log(err)
                     }
                     console.log('Image saved to ', imgName)
                 }
