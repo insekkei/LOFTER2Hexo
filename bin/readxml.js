@@ -58,7 +58,7 @@ var lofter2hexo = {
         parsePost: function(postArray, parseArticle, createMD) {
             postArray.forEach(function(article, index) {
                 var newDate = new Date(parseInt(article.publishTime)).Format("yyyy-MM-dd hh:mm:ss"),
-                    fileName = newDate.substring(0, 10) + '-' + (article.title || '无题') + '.md',
+                    fileName = newDate.substring(0, 16) + '-' + (toMarkdown(article.title.toString()) || '无题') + '.md',
                     allWord = parseArticle(article)
 
                 if (fileName.indexOf('/') != null) {
@@ -108,14 +108,14 @@ function parsearticle(article) {
 
                 headline =  '---\n' +
                             'layout: post\n' +
-                            'title: "' + (article.title || '无题') + '"\n' +
+                            'title: "' + (toMarkdown(article.title.toString()) || '无题') + '"\n' +
                             'date: ' + newDate + '\n' +
                             'author: "' + author + '"\n' +
                             'catalog: 随笔' + '\n' +
                             'tags: \n' + res + '\n---\n'
             } else {
 
-                headline = '---\n' + 'title: ' + (article.title || '无题') + '\n' +
+                headline = '---\n' + 'title: ' + (toMarkdown(article.title.toString()) || '无题') + '\n' +
                         'date: ' + newDate + '\n' +
                         'categories: 随笔' + '\n' +
                         'tags: [' + tags + ']\n\n---\n'
@@ -142,13 +142,14 @@ function parsearticle(article) {
                     imgURL = imgURL.match(/http.*\.jpg|http.*\.jpeg|http.*\.gif|http.*\.png/)
                     if (imgURL) {
                       content = content.replace(/!\[(.*?)\]\((.*?)\)/g, function(whole, imgName, url) {
-                          _downloadImg(imgURL[0], imgName, (article.title || '无题'))
+                          _downloadImg(imgURL[0], imgName, (toMarkdown(article.title.toString()) || '无题'))
                           return `![${imgName}](${imgURL[0].split('/').pop()})`
                       })
                     }
                 })
             }
-        } else if (article.photoLinks != null) {
+        }
+        if (article.photoLinks != null) {
             var text = article.photoLinks[0],
                 imgArray = JSON.parse(text)
 
@@ -157,15 +158,13 @@ function parsearticle(article) {
                     imgURL = img.small
 
                 content += '![图片]' + '(' + imgName + ')\n'
-                _downloadImg(imgURL, imgName, (article.title || '无题'))
+                _downloadImg(imgURL, imgName, (toMarkdown(toMarkdown(article.title.toString()).toString()) || '无题'))
             })
 
-        } else if (article.caption != null) {
+        }
+        if (article.caption != null) {
+            content += toMarkdown(article.caption.toString());
 
-            content = toMarkdown(article.caption.toString());
-
-        } else {
-            console.log(article);
         }
 
         return content
@@ -188,7 +187,7 @@ function parsearticle(article) {
     }
 
     _downloadImg = function(imgURL, imgName, title) {
-              var imagePath = path.resolve(cwd, 'LOFTER/' + newDate.substring(0, 10) + '-' + title)
+              var imagePath = path.resolve(cwd, 'LOFTER/' + newDate.substring(0, 16) + '-' + title)
               if (!fs.existsSync(imagePath)) {
                   fs.mkdirSync(imagePath, 0755)
               }
